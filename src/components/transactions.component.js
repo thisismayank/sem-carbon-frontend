@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { Container, Typography, TextField, Button, Paper, Divider, List, ListItem, ListItemText, ListItemIcon, InputAdornment, IconButton, } from '@mui/material';
 import axios from 'axios';
 
+import _ from "underscore";
 import SideBar from './sidebar.component';
 import NavBar from './navbar.component';
 import Center from './center.component';
@@ -21,6 +22,7 @@ import FastfoodIcon from '@mui/icons-material/Fastfood';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
 import CoffeeMakerIcon from '@mui/icons-material/CoffeeMaker';
+import TopTenTransactions from './toptentransactions.component';
 const Transactions = () => {
     const location = useLocation();
     const userId = sessionStorage.getItem('userId')
@@ -38,6 +40,7 @@ const Transactions = () => {
     const [profileEmail, setProfileEmail] = useState('');
     const [listOfOrders, setListOfOrders] = useState(null);
     const [transactions, setTransactions] = useState([]);
+
 
     const accountData = {
         accountId: '123456789',
@@ -101,6 +104,10 @@ const Transactions = () => {
 
                 console.log('response.data.', response.data)
                 setTransactions(response.data.results.added);
+                const sortedList = await _.sortBy(response.data.results.added, 'carbon');
+                const topTenInSortedList = sortedList.slice(95, 100);
+                sessionStorage.setItem('totalCarbonEmissions', response.data.results.totalCarbonEmissions)
+                sessionStorage.setItem('topTenInSortedList', JSON.stringify(topTenInSortedList))
                 toast.success('List of orders fetched successfully!', { autoClose: 3000 }); // Use toast for success
 
             } else {
@@ -207,9 +214,21 @@ const Transactions = () => {
                                                             },
                                                         }}
                                                     />
+                                                    <ListItemText
+                                                        primary={``}
+                                                        secondary={transaction.carbon > 0 ? `${transaction.carbon.toFixed(2)}kg CO2e` : '-'}
+                                                        secondaryTypographyProps={{
+                                                            variant: 'subtitle1',
+                                                            style: {
+                                                                fontWeight: 'bold',
+                                                                color: '#333', // Adjust color as needed
+                                                                fontSize: 14
+                                                            },
+                                                        }}
+                                                    />
                                                     <Typography variant="caption" style={{ marginLeft: 'auto', marginRight: '8px' }}>
                                                         <ListItemText
-                                                            primary={`${transaction.amount} ${transaction.iso_currency_code}`}
+                                                            primary={`${transaction.amount.toFixed(2)} ${transaction.iso_currency_code}`}
                                                             secondary={moment(transaction.authorized_date).format('MMM D, YYYY ')}
                                                             primaryTypographyProps={{
                                                                 variant: 'subtitle1',
@@ -249,6 +268,7 @@ const Transactions = () => {
                     </Paper>
                 </Container>
             )}
+
         </div>
 
 
