@@ -14,77 +14,79 @@ import axios from 'axios';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+import TopTenTransactions from './toptentransactions.component';
+import { useDrawingArea } from '@mui/x-charts/hooks';
 
 const Center = () => {
 
-    // const monthlyData = {
-    //     "2022": {
-    //         "October": 12,
-    //         "September": 13,
-    //         "August": 12,
-    //         "July": 13,
-    //         "June": 8,
-    //         "May": 6,
-    //         "April": 6,
-    //         "March": 6,
-    //         "February": 6,
-    //         "January": 6,
-    //         "December": 6,
-    //         "November": 6
-    //     },
-    //     "2023": {
-    //         "October": 10,
-    //         "September": 9,
-    //         "August": 8,
-    //         "July": 7,
-    //         "June": 6,
-    //         "May": 5,
-    //         "April": 4,
-    //         "March": 3,
-    //         "February": 2,
-    //         "January": 1,
-    //         "December": 12
-    //     }
-    // };
-    const [monthlyData, setMonthlyData] = useState({
+    const monthlyData = {
         "2022": {
-            "October": null,
-            "September": null,
-            "August": null,
-            "July": null,
-            "June": null,
-            "May": null,
-            "April": null,
-            "March": null,
-            "February": null,
-            "January": null,
-            "December": null,
-            "November": null
+            "October": 12,
+            "September": 13,
+            "August": 12,
+            "July": 13,
+            "June": 8,
+            "May": 6,
+            "April": 6,
+            "March": 6,
+            "February": 6,
+            "January": 6,
+            "December": 6,
+            "November": 6
         },
         "2023": {
-            "October": null,
-            "September": null,
-            "August": null,
-            "July": null,
-            "June": null,
-            "May": null,
-            "April": null,
-            "March": null,
-            "February": null,
-            "January": null,
-            "December": null,
-            "November": null,
-
+            "October": 10,
+            "September": 9,
+            "August": 8,
+            "July": 7,
+            "June": 6,
+            "May": 5,
+            "April": 4,
+            "March": 3,
+            "February": 2,
+            "January": 1,
+            "December": 12
         }
-    })
-    let dataFromStorage = sessionStorage.getItem('yearWiseTransactionData');
-    useEffect(() => {
-        if (dataFromStorage) {
-            dataFromStorage = JSON.parse(dataFromStorage);
+    };
+    // const [monthlyData, setMonthlyData] = useState({
+    //     "2022": {
+    //         "October": null,
+    //         "September": null,
+    //         "August": null,
+    //         "July": null,
+    //         "June": null,
+    //         "May": null,
+    //         "April": null,
+    //         "March": null,
+    //         "February": null,
+    //         "January": null,
+    //         "December": null,
+    //         "November": null
+    //     },
+    //     "2023": {
+    //         "October": null,
+    //         "September": null,
+    //         "August": null,
+    //         "July": null,
+    //         "June": null,
+    //         "May": null,
+    //         "April": null,
+    //         "March": null,
+    //         "February": null,
+    //         "January": null,
+    //         "December": null,
+    //         "November": null,
 
-            setMonthlyData(dataFromStorage);
-        }
-    }, [dataFromStorage])
+    //     }
+    // })
+    // let dataFromStorage = sessionStorage.getItem('yearWiseTransactionData');
+    // useEffect(() => {
+    //     if (dataFromStorage) {
+    //         // dataFromStorage = JSON.parse(dataFromStorage);
+
+    //         setMonthlyData(dataFromStorage);
+    //     }
+    // }, [dataFromStorage])
     const months = [
         "January",
         "February",
@@ -110,7 +112,8 @@ const Center = () => {
         yearWiseData["2022"].push(monthlyData["2022"][month] || 0)
         yearWiseData["2023"].push(monthlyData["2023"][month] || 0)
     }
-    console.log('yearWiseData', yearWiseData)
+
+
 
 
     const [graphData, setGraphData] = useState([
@@ -125,6 +128,7 @@ const Center = () => {
     let categoryWeightedDistribution = sessionStorage.getItem('categoryWeightedDistribution')
     // console.log('categoryWeightedDistribution', categoryWeightedDistribution);
     let categoryWeightedDistributionParsed = [];
+    const [totalCarbonEmissions, setTotalCarbonEmissions] = useState(0);
 
     useEffect(() => {
         if (categoryWeightedDistribution && isGraphDataDefault) {
@@ -142,6 +146,11 @@ const Center = () => {
 
             setGraphData(categoryWeightedDistributionParsed);
             setIsGraphDataDefault(false);
+            let totalEmissionsData = sessionStorage.getItem('totalCarbonEmissions')
+            if (totalEmissionsData) {
+                totalEmissionsData = JSON.parse(totalEmissionsData)
+            }
+            setTotalCarbonEmissions(totalEmissionsData);
         }
     }, [categoryWeightedDistribution, isGraphDataDefault]);
 
@@ -164,6 +173,47 @@ const Center = () => {
 
 
     const [amountInKg, setAmountInKg] = useState(null);
+
+
+    const data = [
+        { value: totalCarbonEmissions, label: 'Your CO2e' },
+        { value: (1000 - Number(totalCarbonEmissions)), label: 'Average CO2e' }
+    ];
+
+    const size = {
+        width: 400,
+        height: 200,
+    };
+    const StyledText = styled('text')(({ theme }) => ({
+        fill: 'black',
+        textAnchor: 'middle',
+        dominantBaseline: 'central',
+        fontSize: 20,
+        fontWeight: "bold"
+    }));
+    function PieCenterLabel({ children }) {
+        const { width, height, left, top } = useDrawingArea();
+        return (
+            <StyledText x={left + width / 2} y={top + height / 2}>
+                {children}
+            </StyledText>
+        );
+    }
+
+    const StyledText2 = styled('text')(({ theme }) => ({
+        fill: 'black',
+        textAnchor: 'middle',
+        dominantBaseline: 'central',
+        fontSize: 12,
+    }));
+    function PieCenterLabel2({ children }) {
+        const { width, height, left, top } = useDrawingArea();
+        return (
+            <StyledText2 x={left + width / 2} y={top + height / 3}>
+                {children}
+            </StyledText2>
+        );
+    }
     const placeOrder = async () => {
         try {
             const response = await axios.post('http://localhost:8000/v1/carbon/cn', {
@@ -194,7 +244,12 @@ const Center = () => {
         }
         // Additional logic for placing an order
     };
-
+    const [transactions, setTransactions] = useState([]);
+    useEffect(() => {
+        const topTenInSortedList = sessionStorage.getItem('topTenInSortedList')
+        const transactionData = JSON.parse(topTenInSortedList)
+        setTransactions(transactionData);
+    }, []);
 
     const handleDownload = () => {
         // Trigger download logic, e.g., using window.location.href
@@ -249,11 +304,11 @@ const Center = () => {
                 padding: '1em 1em 0em 1em',
                 borderRadius: '16px',
                 background: '#F1F1F1',
-                boxShadow: 'inset 8px 8px 16px #c0c0c0, inset -8px -8px 16px #ffffff, 8px 8px 16px #c0c0c0, -8px -8px 16px #ffffff',
+                boxShadow: 'inset 8px 8px 16px #e1e0e0, inset -8px -8px 16px #ffffff, 8px 8px 16px #fff7f7, -8px -8px 16px #ffffff',
                 transition: 'box-shadow 0.3s ease-in-out',
                 textAlign: 'center',
             }}>
-                <Typography variant="body2" display="block" style={{ margin: '0 0 1em 0', color: '#4CAF50', fontWeight: 'bold' }}>
+                <Typography variant="body2" display="block" style={{ margin: '0 0 1em 0', color: '#01b685', fontWeight: 'bold' }}>
                     Place order
                 </Typography>
                 <TextField
@@ -360,7 +415,7 @@ const Center = () => {
                                 //     }
                                 // }}
                                 >
-                                    Center label
+                                    <PieCenterLabel>Transactions</PieCenterLabel>
 
 
                                 </PieChart>
@@ -380,7 +435,34 @@ const Center = () => {
                                 </Grid>
                                 {/* Second Box */}
                                 <Grid item xs={12} sm={12}>
-                                    <Paper style={{ height: 180, backgroundColor: "#e4f1ee", borderRadius: 40, margin: "0px 8px 8px 8px" }}></Paper>
+                                    <Paper style={{ height: 180, borderRadius: 40, margin: "0px 8px 8px 8px" }}>
+                                        <Grid container style={{ padding: 12, fontFamily: "verdana" }}>
+                                            {/* Left Side */}
+                                            <Grid item xs={12} sm={8}>
+                                                <Typography variant="body1" style={{ color: "#01b685", fontSize: 12, marginTop: 12, fontFamily: "verdana" }} gutterBottom>
+                                                    DID YOU KNOW THAT..?
+                                                </Typography>
+                                                <Typography variant="body1" paragraph style={{ fontSize: 12, paddingRight: 30, fontFamily: "verdana" }}>
+                                                    By cooking food at home thrice a week, you can save up to 100 kg CO2 per week!
+                                                </Typography>
+                                                <Button variant="outlined" color="primary"
+                                                    sx={{ borderWidth: '2px', borderStyle: 'solid', fontWeight: 'bold', borderRadius: 20 }}
+
+                                                    style={{ color: "#01b685", borderColor: '#01b685', height: 20, fontSize: 8, marginTop: 12, fontFamily: "verdana" }}>
+                                                    Join Challenge!
+                                                </Button>
+                                            </Grid>
+
+                                            {/* Right Side */}
+                                            <Grid item xs={12} sm={4}>
+                                                <img
+                                                    src="https://spaces-cdn.clipsafari.com/2pogb0jddsodv7foi9x8bwjy605v" // Replace with your actual media asset URL
+                                                    alt="Media Asset"
+                                                    style={{ width: '100%', borderRadius: 8 }}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -390,13 +472,23 @@ const Center = () => {
                                 {/* First Box */}
                                 <Grid item xs={12} sm={12}>
 
-                                    <Paper style={{ height: 200, backgroundColor: "#ffadad", borderRadius: 40, margin: 8 }}></Paper>
+                                    <Paper style={{ height: 200, borderRadius: 40, margin: 8 }}>
+                                        <PieChart series={[{
+                                            data, innerRadius: 60,
+                                            outerRadius: 80,
+                                            paddingAngle: 1,
+                                            cornerRadius: 5,
+                                        }]} {...size}>
+                                            <PieCenterLabel>{`${totalCarbonEmissions} kg`}</PieCenterLabel>
+                                            <PieCenterLabel2>{`Total CO2e`}</PieCenterLabel2>
+                                        </PieChart>
+                                    </Paper>
 
                                 </Grid>
                                 {/* Second Box */}
                                 <Grid item xs={12} sm={12}>
-
-                                    <Paper style={{ height: 435, backgroundColor: "#dedaf4", borderRadius: 40, margin: "0px 8px 8px 8px" }}></Paper>
+                                    {transactions && transactions.length > 0 ? <TopTenTransactions /> :
+                                        <Paper style={{ height: 435, backgroundColor: "#dedaf4", borderRadius: 40, margin: "0px 8px 8px 8px" }}></Paper>}
                                 </Grid>
                             </Grid>
                         </Grid>
