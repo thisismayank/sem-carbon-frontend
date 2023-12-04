@@ -142,10 +142,23 @@ const Onboarding = () => {
 
                 setAuthToken(response.data.results.token)
                 setUserId(response.data.results._id)
+                setFirstName(response.data.results.firstName)
+                setLastName(response.data.results.lastName)
+                setIsExistingUser(true)
+                toast.success('OTP verified!', { autoClose: 3000 }); // Use toast for success
+                sessionStorage.setItem('email', email);
+                sessionStorage.setItem('firstName', response.data.results.firstName);
+                sessionStorage.setItem('lastName', response.data.results.lastName);
+                sessionStorage.setItem('authToken', response.data.results.token);
+                sessionStorage.setItem('userId', response.data.results._id);
+
+
+
 
                 toast.success('User registered successfully!', { autoClose: 3000 }); // Use toast for success
 
                 setIsRegistered(true);
+                navigate('/dashboard');
             } else {
                 toast.error('Failed to register user. Please try again.', { autoClose: 3000 }); // Use toast for success
 
@@ -245,7 +258,17 @@ const Onboarding = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <div style={{ background: 'linear-gradient(to right, #004e00b3, #00FF0024)', minHeight: '100vh', padding: '20px', boxSizing: 'border-box' }}>
+            <div style={{
+                backgroundImage: `url('https://cdn.cundall.com/uploads/images/Blog/_large_image/101591/Reducing-our-personal-carbon-footprint.webp?v=1694522742')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                minHeight: '100vh',
+                padding: '20px',
+                boxSizing: 'border-box',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
 
                 <Container component="main" maxWidth="sm">
                     <Paper elevation={3} style={{
@@ -254,7 +277,7 @@ const Onboarding = () => {
                         textAlign: 'center',
                         borderRadius: '16px',
                         background: '#F1F1F1',
-                        boxShadow: 'inset 20px 20px 60px #c0c0c0, inset -20px -20px 60px #ffffff, 20px 20px 60px #bebebe, -20px -20px 60px #ffffff',
+                        boxShadow: 'inset 20px 20px 60px #c0c0c0, inset -20px -20px 60px #06520f, 20px 20px 60px #bebebe, -20px -20px 60px #ffffff',
                         transition: 'box-shadow 0.3s ease-in-out',
 
                         margin: "20% auto",

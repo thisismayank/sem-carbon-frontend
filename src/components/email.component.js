@@ -6,8 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const EmailComponent = ({ email, setEmail, validateEmail, generateOtp, isValidEmail }) => {
-    // const [isValidEmail, setIsValidEmail] = useState(false);
-
     return (
         <>
             <Container component="main" maxWidth="xs" style={{ width: 400 }}>
